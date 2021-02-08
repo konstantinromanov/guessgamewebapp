@@ -7,12 +7,12 @@ namespace GuessGameWebApp.Models
 {
     public class Game
     {
-
+        public string GuessNumber { get; set; }
+        public string UserName { get; set; }
+        public int Tries { get; set; }
         public int RandomNum { get; set; }
 
-
-        public static int guessTimes = 4;
-        int[][] logResults = new int[guessTimes][];
+        public int[][] logResults = new int[4][];
 
 
 
