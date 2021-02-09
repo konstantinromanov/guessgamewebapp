@@ -13,14 +13,14 @@ namespace GuessGameWebApp.Controllers
         static List<Game> GamesHistory = new List<Game>();
 
         public IActionResult Index()
-        {           
+        {
 
             return View();
         }
 
         public IActionResult FirstScreen()
         {
-            GamesHistory.Add(new Game() { RandomNum = RandomNumberService.GenerateRandomNum(), Tries = 4, TriesLeft = 4 });
+            GamesHistory.Add(new Game() { RandomNum = RandomNumberService.GenerateRandomNum() });
             return View();
         }
 
@@ -44,28 +44,37 @@ namespace GuessGameWebApp.Controllers
                 return View();
             }
 
-           
+
 
             int numberRandom = GamesHistory.ElementAt(gameNumber).RandomNum;
 
             int cleanNum = int.Parse(guess.GuessNumber1 + guess.GuessNumber2 + guess.GuessNumber3 + guess.GuessNumber4);
 
 
-            
+
 
             int[] result = GuessService.Guessing(numberRandom, cleanNum);
 
             GamesHistory.ElementAt(gameNumber).logResults[triesLeft - 1] = result;
 
-            string logOut = "<div>";
-            
-            for (int j = GamesHistory.ElementAt(gameNumber).Tries - 1; j >= triesLeft - 1; j--)
+            if (cleanNum == numberRandom)
             {
-                logOut = logOut + (GamesHistory.ElementAt(gameNumber).Tries - j) + ": " + "Number " + GamesHistory.ElementAt(gameNumber).logResults[j][0] + ", P: " + GamesHistory.ElementAt(gameNumber).logResults[j][1] + ", M: " + GamesHistory.ElementAt(gameNumber).logResults[j][2] + ". " + "<br />";
+                ViewBag.WinStatus = "You won!";
+                ViewBag.SecretNumber = numberRandom;
+                return View("GameOver");
+            }
+            
+
+
+            string logOut = "<div>";
+
+            for (int j = Game.Tries - 1; j >= triesLeft - 1; j--)
+            {
+                logOut = logOut + (Game.Tries - j) + ": " + "Number " + GamesHistory.ElementAt(gameNumber).logResults[j][0] + ", P: " + GamesHistory.ElementAt(gameNumber).logResults[j][1] + ", M: " + GamesHistory.ElementAt(gameNumber).logResults[j][2] + ". " + "<br />";
             }
 
-            logOut = ViewBag.LogOut + "<div />";
-            
+            logOut = logOut + "<div />";
+
 
             triesLeft--;
 
@@ -74,31 +83,23 @@ namespace GuessGameWebApp.Controllers
             ViewBag.Result = "P: " + result[1].ToString() + ", M: " + result[2].ToString();
             ViewBag.Logout = logOut;
 
-           
+
 
 
             GamesHistory.ElementAt(gameNumber).TriesLeft = triesLeft;
             GamesHistory.ElementAt(gameNumber).logResults[triesLeft] = result;
 
-            
+
 
             if (triesLeft == 0)
             {
+                ViewBag.WinStatus = "You lost!";
                 ViewBag.SecretNumber = numberRandom;
                 return View("GameOver");
             }
 
             return View("GameScreen", guess);
         }
-
-        public IActionResult HandleButtonClick(Game guess)
-        {
-
-
-            return View("GameScreen");
-        }
-
-
 
 
     }
