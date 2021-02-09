@@ -1,24 +1,67 @@
-﻿@model GuessGameWebApp.Models.Game
+﻿@*
+  For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
 
-<h4>Let's play a game</h4>
+<style>
 
+  .index {
+    padding-top: 70px;
+    min-height: 100vh;
+  }
+</style>
 
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="GameScreen">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label"></label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<section class="index">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Game rules:</h2>
+
+        <ul>
+          <li>Program chooses a random secret number with 4 digits.</li>
+          <li>All digits in the secret number are different.</li>
+          <li>Player has 8 tries to guess the secret number.</li>
+          <li>
+            After each guess program displays the message "M:m; P:p" where:
+            <ul>
+              <li>m - number of matching digits but not on the right places</li>
+              <li>p - number of matching digits on exact places</li>
+            </ul>
+          </li>
+          <li>Game ends after 8 tries or if the correct number is guessed.</li>
+        </ul>
+
+        <p>Samples:</p>
+        <p>Secret: </p>
+        <strong>7046</strong>
+        Guess:
+        <strong>8724</strong>
+        Message:
+        <strong>M:2; P:0</strong>
+
+        <p>Secret: </p>
+        <strong>7046</strong>
+        Guess:
+        <strong>7842</strong>
+        Message:
+        <strong>M:0; P:2</strong>
+
+        <p>Secret: </p>
+        <strong>7046</strong>
+        Guess:
+        <strong>7640</strong>
+        Message:
+        <strong>M:2; P:2</strong>
+
+        <hr />
+
+
+        <div class="col-12 my-4 text-center">
+          <a asp-controller="Game" asp-action="FirstScreen" type="button" class="btn btn-outline-primary">Start the Game</a>
+        </div>
+
+
+      </div>
     </div>
-</div>
-
-
-
+  </div>
+</section>
