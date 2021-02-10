@@ -20,6 +20,7 @@ namespace GuessGameWebApp.Models
         public int TriesLeft = Tries;
         public int[][] logResults = new int[Tries][];
 
+        public string GameStatus = "Lost";
 
 
     }

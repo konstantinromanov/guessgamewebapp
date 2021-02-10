@@ -61,6 +61,7 @@ namespace GuessGameWebApp.Controllers
             {
                 ViewBag.WinStatus = "You won!";
                 ViewBag.SecretNumber = numberRandom;
+                GamesHistory.ElementAt(gameNumber).GameStatus = "Won";
                 return View("GameOver");
             }
             
@@ -95,12 +96,16 @@ namespace GuessGameWebApp.Controllers
             {
                 ViewBag.WinStatus = "You lost!";
                 ViewBag.SecretNumber = numberRandom;
+                GamesHistory.ElementAt(gameNumber).GameStatus = "Lost";
                 return View("GameOver");
             }
 
-            return View("GameScreen", guess);
+            return View();
         }
 
-
+        public IActionResult LeaderBoard()
+        {
+            return View(GamesHistory);
+        }
     }
 }
