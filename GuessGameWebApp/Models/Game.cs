@@ -8,12 +8,7 @@ namespace GuessGameWebApp.Models
 {
     public class Game
     {
-        public static int Tries = 8;
-        //public List<Try> TriesHistory = new List<Try>();
-        public string GuessNumber1 { get; set; }
-        public string GuessNumber2 { get; set; }
-        public string GuessNumber3 { get; set; }
-        public string GuessNumber4 { get; set; }
+        public static int Tries = 8;       
 
         public string UserName { get; set; }
 
@@ -21,7 +16,10 @@ namespace GuessGameWebApp.Models
 
 
         public int TriesLeft = Tries;
+
         public int[][] logResults = new int[Tries][];
+
+        public string logOut { get; set; }
 
         public string GameStatus = "Lost";
 

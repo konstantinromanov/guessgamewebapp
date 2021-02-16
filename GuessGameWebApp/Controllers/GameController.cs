@@ -15,6 +15,7 @@ namespace GuessGameWebApp.Controllers
 
         public Game game;
 
+        
 
         public IActionResult Index()
         {
@@ -27,18 +28,18 @@ namespace GuessGameWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult FirstScreen(Game name)
+        public IActionResult FirstScreen(string UserName)
         {
             game = new Game();
-            game.UserName = name.UserName;
+            game.UserName = UserName;
             game.RandomNum = RandomNumberService.GenerateRandomNum();
             ViewBag.TriesLeft = game.TriesLeft;
-            ViewBag.Greeting = name.UserName;
+            ViewBag.Greeting = UserName;
             HttpContext.Session.SetString("SessionUser", JsonConvert.SerializeObject(game));
-            return View("GameScreen", game);
+            return View("GameScreen");
         }
 
-        public IActionResult GameScreen(Game game)
+        public IActionResult GameScreen(string GuessNumber1, string GuessNumber2, string GuessNumber3, string GuessNumber4)
         {
 
             Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));
@@ -53,7 +54,19 @@ namespace GuessGameWebApp.Controllers
 
 
             int numberRandom = sessionUser.RandomNum;
-            int cleanNum = int.Parse(game.GuessNumber1 + game.GuessNumber2 + game.GuessNumber3 + game.GuessNumber4);
+
+
+           
+            string enteredNum = GuessNumber1 + GuessNumber2 + GuessNumber3 + GuessNumber4;
+            int cleanNum = 0;
+
+            if (!int.TryParse(enteredNum, out cleanNum) || enteredNum.Length != numberRandom.ToString().Length)
+            {
+                ViewBag.PreviousGuess = "Please enter 4 single digits";
+                ViewBag.Logout = sessionUser.logOut;
+                return View("GameScreen");
+            }
+
 
 
             int[] result = GuessService.Guessing(numberRandom, cleanNum);
@@ -69,8 +82,6 @@ namespace GuessGameWebApp.Controllers
                 return View("GameOver");
             }
 
-
-
             string logOut = "<div>";
 
             for (int j = Game.Tries - 1; j >= triesLeft - 1; j--)
@@ -79,7 +90,7 @@ namespace GuessGameWebApp.Controllers
             }
 
             logOut = logOut + "<div />";
-
+            sessionUser.logOut = logOut;
 
             triesLeft--;
 
@@ -91,8 +102,6 @@ namespace GuessGameWebApp.Controllers
             sessionUser.TriesLeft = triesLeft;
             
             sessionUser.logResults[triesLeft] = result;
-
-
 
             if (triesLeft == 0)
             {

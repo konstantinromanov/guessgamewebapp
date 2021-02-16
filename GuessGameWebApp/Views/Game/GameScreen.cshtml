@@ -1,4 +1,4 @@
-﻿@model GuessGameWebApp.Models.Game
+﻿
 
 <h1>Player: @ViewBag.Greeting</h1>
 <h2>You have @ViewBag.TriesLeft tries</h2>
@@ -7,39 +7,39 @@
 
 
 <form asp-action="GameScreen">
-  <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+  
   <div class="container">
     <div class="row my-10">
 
       <div class="col-md-2">
         <div class="form-group">
-          <label asp-for="GuessNumber1" class="control-label">Digit 1</label>
-          <input asp-for="GuessNumber1" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
-          <span asp-validation-for="GuessNumber1" class="text-danger"></span>
+          <label name="GuessNumber1" class="control-label">Digit 1</label>
+          <input name="GuessNumber1" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
+          
         </div>
       </div>
 
       <div class="col-md-2">
         <div class="form-group">
-          <label asp-for="GuessNumber2" class="control-label">Digit 2</label>
-          <input asp-for="GuessNumber2" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
-          <span asp-validation-for="GuessNumber2" class="text-danger"></span>
+          <label name="GuessNumber2" class="control-label">Digit 2</label>
+          <input name="GuessNumber2" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
+          
         </div>
       </div>
 
       <div class="col-md-2">
         <div class="form-group">
-          <label asp-for="GuessNumber3" class="control-label">Digit 4</label>
-          <input asp-for="GuessNumber3" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
-          <span asp-validation-for="GuessNumber3" class="text-danger"></span>
+          <label name="GuessNumber3" class="control-label">Digit 4</label>
+          <input name="GuessNumber3" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
+          
         </div>
       </div>
 
       <div class="col-md-2">
         <div class="form-group">
-          <label asp-for="GuessNumber4" class="control-label">Digit 4</label>
-          <input asp-for="GuessNumber4" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
-          <span asp-validation-for="GuessNumber4" class="text-danger"></span>
+          <label name="GuessNumber4" class="control-label">Digit 4</label>
+          <input name="GuessNumber4" class="form-control" maxlength="1" style="width: 55px;" placeholder="?" />
+          
         </div>
       </div>
 
