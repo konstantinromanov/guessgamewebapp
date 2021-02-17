@@ -3,16 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace GuessGameWebApp.Models
 {
     public class Game
     {
         public static int Tries = 8;       
-
+                
         public string UserName { get; set; }
 
-        public int RandomNum { get; set; } // = RandomNumberService.GenerateRandomNum();
+        public int RandomNum { get; set; } = RandomNumberService.GenerateRandomNum();
 
 
         public int TriesLeft = Tries;
