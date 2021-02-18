@@ -3,6 +3,35 @@
 <hr />
 <h1>Leader board</h1>
 <section class="mt-5">
+
+  <hr />
+  <h3>
+    Enter minimum games played <b>N</b> to show on the Leader board
+  </h3>
+  <div class="my-3 mx-2"><b>N</b> is set to @ViewBag.NgamesPlayed currently</div>
+  <form asp-action="LeaderBoard">
+    
+    <div class="container">
+      <div class="row w-25">
+
+        <div class="col">          
+          <div class="form-group">
+            
+            <input name="n" class="form-control" maxlength="100" style="width: 75px;" placeholder="?" />
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="form-group">
+            <input type="submit" value="N" class="btn btn-outline-primary" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+
   <table class="table">
     <thead>
       <tr>

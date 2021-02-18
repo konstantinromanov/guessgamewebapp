@@ -45,16 +45,21 @@ namespace GuessGameWebApp.Controllers
             return View("GameScreen");
         }
 
-        public IActionResult GameScreen(string GuessNumber1, string GuessNumber2, string GuessNumber3, string GuessNumber4)
+        public IActionResult HandleGuess(string GuessNumber1, string GuessNumber2, string GuessNumber3, string GuessNumber4)
         {
+
+            if (HttpContext.Session.GetString("SessionUser") == null)
+            {
+                return View("FirstScreen");
+            }
 
             Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));
 
-            ViewBag.Greeting = sessionUser.UserName;
 
 
             int triesLeft = sessionUser.TriesLeft;
 
+            ViewBag.Greeting = sessionUser.UserName;
             ViewBag.TriesLeft = triesLeft;
             ViewBag.Greeting = sessionUser.UserName;
 
@@ -146,7 +151,7 @@ namespace GuessGameWebApp.Controllers
 
                 sessionUser.GameStatus = "Lost";
 
-               
+
 
                 var player = new Player();
                 player.Name = sessionUser.UserName;
@@ -174,28 +179,32 @@ namespace GuessGameWebApp.Controllers
 
                     _context.Add(player);
                     _context.SaveChanges();
-                }               
-                
+                }
+
                 return View("GameOver");
             }
 
             HttpContext.Session.SetString("SessionUser", JsonConvert.SerializeObject(sessionUser));
 
-            return View();
+            return View("GameScreen");
         }
 
 
 
 
-        public IActionResult LeaderBoard()
+        public IActionResult LeaderBoard(int n = 1)
         {
-            var sortedRank = from s in _context.Player
-                             select s;
-            sortedRank = sortedRank.OrderByDescending(s => s.Rank);
+
+            ViewBag.NgamesPlayed = n;
+
+            var sortedRank = from r in _context.Player                        
+                        where r.GamesPlayed >= n
+                        select r;
+
+            sortedRank = sortedRank.OrderByDescending(r => r.Rank).ThenBy(g => g.GamesPlayed);
 
 
             return View(sortedRank);
-            
         }
     }
 }
