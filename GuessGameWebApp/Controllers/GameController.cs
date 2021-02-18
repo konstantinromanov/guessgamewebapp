@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace GuessGameWebApp.Controllers
 {
@@ -56,21 +57,21 @@ namespace GuessGameWebApp.Controllers
         [HttpPost]
         public IActionResult HandleGuess(GuessInput guess)
         {
-            Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));           
+            Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));
 
             if (HttpContext.Session.GetString("SessionUser") == null)
             {
                 return View("FirstScreen");
-            }            
+            }
 
 
-            int triesLeft = sessionUser.TriesLeft;           
+            int triesLeft = sessionUser.TriesLeft;
 
             if (!ModelState.IsValid)
             {
                 ViewBag.Greeting = sessionUser.UserName;
                 ViewBag.TriesLeft = triesLeft;
-                ViewBag.ScreenMessage = "Please enter 4 digits. 4 digits number can't start with 0.";                
+                ViewBag.ScreenMessage = "Please enter 4 digits. 4 digits number can't start with 0.";
                 ViewBag.Logout = sessionUser.LogPrintOut;
 
                 return View("GameScreen");
@@ -89,7 +90,6 @@ namespace GuessGameWebApp.Controllers
 
                 return View("GameScreen");
             }
-
 
 
             int[] result = GuessService.Guessing(numberRandom, cleanNum);
@@ -137,9 +137,17 @@ namespace GuessGameWebApp.Controllers
             return View("GameScreen");
         }
 
-
-        public IActionResult LeaderBoard(int n = 1)
+        
+        public IActionResult LeaderBoard(string nStr)
         {
+            int n = 1;
+
+            Regex nRegex = new Regex("^[0-9]{1,2}$");
+
+            if (nStr != null && nRegex.IsMatch(nStr))
+            {
+                n = int.Parse(nStr);
+            }
 
             ViewBag.NgamesPlayed = n;
 
@@ -148,7 +156,6 @@ namespace GuessGameWebApp.Controllers
                              select r;
 
             sortedRank = sortedRank.OrderByDescending(r => r.Rank).ThenBy(g => g.GamesPlayed);
-
 
             return View(sortedRank);
         }
