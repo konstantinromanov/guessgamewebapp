@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace GuessGameWebApp.Controllers
 {
@@ -34,54 +35,67 @@ namespace GuessGameWebApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult FirstScreen(string UserName)
+        [ValidateAntiForgeryToken]
+        public IActionResult FirstScreen(FirstScreenInput user)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             game = new Game();
-            game.UserName = UserName;
+            game.UserName = user.Name;
 
             ViewBag.TriesLeft = game.TriesLeft;
-            ViewBag.Greeting = UserName;
+            ViewBag.Greeting = user.Name;
             HttpContext.Session.SetString("SessionUser", JsonConvert.SerializeObject(game));
+
             return View("GameScreen");
+
         }
 
-        public IActionResult HandleGuess(string GuessNumber1, string GuessNumber2, string GuessNumber3, string GuessNumber4)
+        [HttpPost]
+        public IActionResult HandleGuess(GuessInput guess)
         {
+            Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));           
 
             if (HttpContext.Session.GetString("SessionUser") == null)
             {
                 return View("FirstScreen");
+            }            
+
+
+            int triesLeft = sessionUser.TriesLeft;           
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Greeting = sessionUser.UserName;
+                ViewBag.TriesLeft = triesLeft;
+                ViewBag.ScreenMessage = "Please enter 4 digits. 4 digits number can't start with 0.";                
+                ViewBag.Logout = sessionUser.LogPrintOut;
+
+                return View("GameScreen");
             }
-
-            Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));
-
-
-            int triesLeft = sessionUser.TriesLeft;
-
-            ViewBag.Greeting = sessionUser.UserName;
-            ViewBag.TriesLeft = triesLeft;
-            ViewBag.Greeting = sessionUser.UserName;
-
 
             int numberRandom = sessionUser.RandomNum;
 
 
-            string enteredNum = GuessNumber1 + GuessNumber2 + GuessNumber3 + GuessNumber4;
+            string enteredNum = guess.GuessDigit1 + guess.GuessDigit2 + guess.GuessDigit3 + guess.GuessDigit4;
             int cleanNum = 0;
 
-            if (!int.TryParse(enteredNum, out cleanNum) || enteredNum.Length != numberRandom.ToString().Length)
+            if (!int.TryParse(enteredNum, out cleanNum) || cleanNum.ToString().Length != numberRandom.ToString().Length || enteredNum.Distinct().Count() != enteredNum.Count())
             {
-                ViewBag.PreviousGuess = "Please enter 4 single digits";
-                ViewBag.Logout = sessionUser.logPrintOut;
+                ViewBag.ScreenMessage = "Digits must be distinct.";
+                ViewBag.Logout = sessionUser.LogPrintOut;
 
                 return View("GameScreen");
             }
 
 
+
             int[] result = GuessService.Guessing(numberRandom, cleanNum);
 
 
-            sessionUser.logResults[triesLeft - 1] = result;
+            sessionUser.LogResults[triesLeft - 1] = result;
 
             if (cleanNum == numberRandom)
             {
@@ -90,43 +104,33 @@ namespace GuessGameWebApp.Controllers
 
                 sessionUser.GameStatus = "Won";
 
-                Game.UpdateLeaderBoard(_context, sessionUser);
+                LeaderBoardUpdateService.UpdateLeaderBoard(_context, sessionUser);
 
                 return View("GameOver");
             }
 
-            string logPrintOut = "<div>";
-
-            for (int j = Game.Tries - 1; j >= triesLeft - 1; j--)
-            {
-                logPrintOut = logPrintOut + (Game.Tries - j) + ": " + "Number " + sessionUser.logResults[j][0] + ", P: " + sessionUser.logResults[j][1] + ", M: " + sessionUser.logResults[j][2] + ". " + "<br />";
-            }
-
-            logPrintOut = logPrintOut + "<div />";
-            sessionUser.logPrintOut = logPrintOut;
-
             triesLeft--;
 
-            ViewBag.TriesLeft = triesLeft;
-            ViewBag.PreviousGuess = "Your previous guess was: " + cleanNum.ToString();
-            ViewBag.Result = "P: " + result[1].ToString() + ", M: " + result[2].ToString();
-            ViewBag.Logout = logPrintOut;
-
-            sessionUser.TriesLeft = triesLeft;
-
-            sessionUser.logResults[triesLeft] = result;
-
-            if (triesLeft == 6)
+            if (triesLeft == 0)
             {
                 ViewBag.WinStatus = "You lost!";
                 ViewBag.SecretNumber = numberRandom;
 
                 sessionUser.GameStatus = "Lost";
 
-                Game.UpdateLeaderBoard(_context, sessionUser);
+                LeaderBoardUpdateService.UpdateLeaderBoard(_context, sessionUser);
 
                 return View("GameOver");
             }
+
+            ViewBag.TriesLeft = triesLeft;
+            ViewBag.ScreenMessage = "Your previous guess was: " + cleanNum.ToString();
+            ViewBag.Result = "P: " + result[1].ToString() + ", M: " + result[2].ToString();
+            ViewBag.Logout = Game.logBuilder(sessionUser);
+
+            sessionUser.TriesLeft = triesLeft;
+
+            sessionUser.LogResults[triesLeft] = result;
 
             HttpContext.Session.SetString("SessionUser", JsonConvert.SerializeObject(sessionUser));
 
@@ -147,6 +151,12 @@ namespace GuessGameWebApp.Controllers
 
 
             return View(sortedRank);
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -19,59 +19,26 @@ namespace GuessGameWebApp.Models
 
         public int TriesLeft = Tries;
 
-        public int[][] logResults = new int[Tries][];
+        public int[][] LogResults = new int[Tries][];
 
-        public string logPrintOut { get; set; }
+        public string LogPrintOut { get; set; }
 
         public string GameStatus = "Lost";
 
 
-
-        public static void UpdateLeaderBoard(ApplicationDbContext context, Game sessionUser)
+        public static string logBuilder(Game sessionUser)
         {
-            
-            var player = new Player();
-            player.Name = sessionUser.UserName;
+            string logPrintOut = "<div>";
 
-
-            if (context.Player.Where(u => u.Name == player.Name).Any())
+            for (int j = Tries - 1; j >= sessionUser.TriesLeft - 1; j--)
             {
-
-                player = context.Player.First(m => m.Name == player.Name);
-                if (sessionUser.GameStatus == "Won")
-                {
-                    player.Wins += 1;
-                }
-                else
-                {
-                    player.Loses += 1;
-                }
-
-                player.GamesPlayed += 1;
-                player.Rank = (decimal)player.Wins / (decimal)player.GamesPlayed;
-
-                context.Update(player);
-            }
-            else
-            {
-                if (sessionUser.GameStatus == "Won")
-                {
-                    player.Wins = 1;
-                    player.Loses = 0;
-                }
-                else
-                {
-                    player.Wins = 0;
-                    player.Loses = 1;
-                }
-
-                player.GamesPlayed = 1;
-                player.Rank = (decimal)player.Wins / (decimal)player.GamesPlayed;
-
-                context.Add(player);
+                logPrintOut = logPrintOut + (Tries - j) + ": " + "Number " + sessionUser.LogResults[j][0] + ", P: " + sessionUser.LogResults[j][1] + ", M: " + sessionUser.LogResults[j][2] + ". " + "<br />";
             }
 
-            context.SaveChanges();
+            logPrintOut = logPrintOut + "<div />";
+
+            return sessionUser.LogPrintOut = logPrintOut;
         }
+
     }
 }
