@@ -56,7 +56,6 @@ namespace GuessGameWebApp.Controllers
             Game sessionUser = JsonConvert.DeserializeObject<Game>(HttpContext.Session.GetString("SessionUser"));
 
 
-
             int triesLeft = sessionUser.TriesLeft;
 
             ViewBag.Greeting = sessionUser.UserName;
@@ -67,17 +66,16 @@ namespace GuessGameWebApp.Controllers
             int numberRandom = sessionUser.RandomNum;
 
 
-
             string enteredNum = GuessNumber1 + GuessNumber2 + GuessNumber3 + GuessNumber4;
             int cleanNum = 0;
 
             if (!int.TryParse(enteredNum, out cleanNum) || enteredNum.Length != numberRandom.ToString().Length)
             {
                 ViewBag.PreviousGuess = "Please enter 4 single digits";
-                ViewBag.Logout = sessionUser.logOut;
+                ViewBag.Logout = sessionUser.logPrintOut;
+
                 return View("GameScreen");
             }
-
 
 
             int[] result = GuessService.Guessing(numberRandom, cleanNum);
@@ -89,97 +87,43 @@ namespace GuessGameWebApp.Controllers
             {
                 ViewBag.WinStatus = "You won!";
                 ViewBag.SecretNumber = numberRandom;
+
                 sessionUser.GameStatus = "Won";
 
-                var player = new Player();
-                player.Name = sessionUser.UserName;
-
-                if (_context.Player.Where(u => u.Name == player.Name).Any())
-                {
-
-                    var playerUp = _context.Player.First(m => m.Name == player.Name);
-                    playerUp.Wins += 1;
-                    playerUp.GamesPlayed += 1;
-
-                    playerUp.Rank = (decimal)playerUp.Wins / (decimal)playerUp.GamesPlayed;
-
-                    _context.Update(playerUp);
-                    _context.SaveChanges();
-
-                }
-                else
-                {
-                    player.Loses = 0;
-                    player.Wins = 1;
-
-                    player.GamesPlayed = 1;
-                    player.Rank = (decimal)player.Wins / (decimal)player.GamesPlayed;
-
-                    _context.Add(player);
-                    _context.SaveChanges();
-                }
-
+                Game.UpdateLeaderBoard(_context, sessionUser);
 
                 return View("GameOver");
             }
 
-            string logOut = "<div>";
+            string logPrintOut = "<div>";
 
             for (int j = Game.Tries - 1; j >= triesLeft - 1; j--)
             {
-                logOut = logOut + (Game.Tries - j) + ": " + "Number " + sessionUser.logResults[j][0] + ", P: " + sessionUser.logResults[j][1] + ", M: " + sessionUser.logResults[j][2] + ". " + "<br />";
+                logPrintOut = logPrintOut + (Game.Tries - j) + ": " + "Number " + sessionUser.logResults[j][0] + ", P: " + sessionUser.logResults[j][1] + ", M: " + sessionUser.logResults[j][2] + ". " + "<br />";
             }
 
-            logOut = logOut + "<div />";
-            sessionUser.logOut = logOut;
+            logPrintOut = logPrintOut + "<div />";
+            sessionUser.logPrintOut = logPrintOut;
 
             triesLeft--;
 
             ViewBag.TriesLeft = triesLeft;
             ViewBag.PreviousGuess = "Your previous guess was: " + cleanNum.ToString();
             ViewBag.Result = "P: " + result[1].ToString() + ", M: " + result[2].ToString();
-            ViewBag.Logout = logOut;
+            ViewBag.Logout = logPrintOut;
 
             sessionUser.TriesLeft = triesLeft;
 
             sessionUser.logResults[triesLeft] = result;
 
-            if (triesLeft == 0)
+            if (triesLeft == 6)
             {
                 ViewBag.WinStatus = "You lost!";
                 ViewBag.SecretNumber = numberRandom;
 
                 sessionUser.GameStatus = "Lost";
 
-
-
-                var player = new Player();
-                player.Name = sessionUser.UserName;
-
-                if (_context.Player.Where(u => u.Name == player.Name).Any())
-                {
-
-                    var playerUp = _context.Player.First(m => m.Name == player.Name);
-                    playerUp.Loses += 1;
-                    playerUp.GamesPlayed += 1;
-
-                    playerUp.Rank = (decimal)playerUp.Wins / (decimal)playerUp.GamesPlayed;
-
-                    _context.Update(playerUp);
-                    _context.SaveChanges();
-
-                }
-                else
-                {
-                    player.Loses = 1;
-                    player.Wins = 0;
-
-                    player.GamesPlayed = 1;
-                    player.Rank = (decimal)player.Wins / (decimal)player.GamesPlayed;
-
-                    _context.Add(player);
-                    _context.SaveChanges();
-                }
+                Game.UpdateLeaderBoard(_context, sessionUser);
 
                 return View("GameOver");
             }
@@ -190,16 +134,14 @@ namespace GuessGameWebApp.Controllers
         }
 
 
-
-
         public IActionResult LeaderBoard(int n = 1)
         {
 
             ViewBag.NgamesPlayed = n;
 
-            var sortedRank = from r in _context.Player                        
-                        where r.GamesPlayed >= n
-                        select r;
+            var sortedRank = from r in _context.Player
+                             where r.GamesPlayed >= n
+                             select r;
 
             sortedRank = sortedRank.OrderByDescending(r => r.Rank).ThenBy(g => g.GamesPlayed);
 
