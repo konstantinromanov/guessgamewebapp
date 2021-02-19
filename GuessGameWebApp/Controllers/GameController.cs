@@ -16,12 +16,20 @@ namespace GuessGameWebApp.Controllers
 {
     public class GameController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        // For Static List Db usage;
+        //private static List<Player> _context = new List<Player>();
 
-        public GameController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        //For InMemoryDb;
+        public static IPlayerRepository _context = InMemoryDb.GetInMemoryRepository();
+
+        // For Db usage;
+        //private readonly IPlayerRepository _context;
+
+        // For Db usage;
+        //public GameController(IPlayerRepository context)
+        //{
+        //    _context = context;
+        //}
 
         public Game game;
 
@@ -151,7 +159,7 @@ namespace GuessGameWebApp.Controllers
 
             ViewBag.NgamesPlayed = n;
 
-            var sortedRank = from r in _context.Player
+            var sortedRank = from r in _context.Player // For Static List usage _context // For Db usage _context.Player
                              where r.GamesPlayed >= n
                              select r;
 

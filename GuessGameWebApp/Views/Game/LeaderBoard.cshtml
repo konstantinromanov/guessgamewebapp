@@ -8,7 +8,7 @@
   <h3>
     Enter minimum games played <b>N</b> to show on the Leader board
   </h3>
-  <div class="my-3 mx-2"><b>N</b> is set to @ViewBag.NgamesPlayed currently</div>
+  @*<div class="my-3 mx-2"><b>N</b> is set to @ViewBag.NgamesPlayed currently</div>*@
   <form asp-action="LeaderBoard">
     
     <div class="container">
@@ -17,7 +17,7 @@
         <div class="col">          
           <div class="form-group">
             
-            <input name="nStr" class="form-control" maxlength="2" style="width: 75px;" placeholder="?" />
+            <input name="nStr" type="text" class="form-control" maxlength="2" style="width: 75px;" placeholder="@ViewBag.NgamesPlayed" />
           </div>
         </div>
 
