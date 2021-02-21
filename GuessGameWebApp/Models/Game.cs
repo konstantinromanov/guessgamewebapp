@@ -23,7 +23,7 @@ namespace GuessGameWebApp.Models
 
         public string LogPrintOut { get; set; }
 
-        public string GameStatus = "Lost";
+        public string GameStatus = "lost";
 
 
         public static string logBuilder(Game sessionUser)

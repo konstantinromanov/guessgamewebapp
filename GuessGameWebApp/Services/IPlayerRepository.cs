@@ -10,11 +10,12 @@ namespace GuessGameWebApp.Models
     {
         public IQueryable<Player> Player { get; }
 
-        //void Add<EntityType>(EntityType entity);
-        //void Update<EntityType>(EntityType entity);
-        void Add(Player player);
-        void Update(Player player);
-        
-        void SaveChanges();
+        //void Add(Player player);
+        //void Update(Player player);
+        //void SaveChanges();
+
+        void Add<EntityType>(EntityType player);
+        void Update<EntityType>(EntityType player);
+        void SaveChanges();        
     }
 }
