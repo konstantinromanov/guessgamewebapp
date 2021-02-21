@@ -10,7 +10,7 @@ namespace GuessGameWebApp.Models
     {
         [Required(ErrorMessage = "Required")]
         [StringLength(1, ErrorMessage = "Must be single value")]
-        [RegularExpression("[1-9]", ErrorMessage = "First must be non 0 digit")]        
+        [RegularExpression("[1-9]", ErrorMessage = "First must be non 0 digit")]
         public string GuessDigit1 { get; set; }
 
         [Required(ErrorMessage = "Required")]
@@ -27,7 +27,6 @@ namespace GuessGameWebApp.Models
         [StringLength(1, ErrorMessage = "Must be single value")]
         [RegularExpression("[0-9]", ErrorMessage = "Must be digit")]
         public string GuessDigit4 { get; set; }
-
 
     }
 }

@@ -16,31 +16,28 @@ namespace GuessGameWebApp.Controllers
 {
     public class GameController : Controller
     {
-       
-        //-----------------For InMemoryDb-------------------
 
-        public static IPlayerRepository _context = InMemoryDb.GetInMemoryRepository();
+        private readonly IPlayerRepository _context;
 
-        // ----------------For Db usage---------------------
+        public GameController(IPlayerRepository context)
+        {
+            // ----------------For Db usage---------------------
+            _context = context;
 
-        //private readonly IPlayerRepository _context;
-        
-        //public GameController(IPlayerRepository context)
-        //{
-        //    _context = context;
-        //}
-        // -------------------------------------------------
+            //-----------------For InMemoryDb-------------------
+            _context = InMemoryDb.GetInMemoryRepository();
+        }
 
         public Game CurrentGame;
 
         public IActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         public IActionResult FirstScreen()
         {
-            return View();
+            return View("FirstScreen");
         }
 
         [HttpPost]
@@ -49,7 +46,7 @@ namespace GuessGameWebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                return View("FirstScreen");
             }
             CurrentGame = new Game();
             CurrentGame.UserName = user.Name;
@@ -59,7 +56,6 @@ namespace GuessGameWebApp.Controllers
             HttpContext.Session.SetString("SessionUser", JsonConvert.SerializeObject(CurrentGame));
 
             return View("GameScreen");
-
         }
 
         [HttpPost]
@@ -68,7 +64,7 @@ namespace GuessGameWebApp.Controllers
 
             if (HttpContext.Session.GetString("SessionUser") == null)
             {
-                
+
                 return View("FirstScreen");
             }
 
@@ -81,19 +77,20 @@ namespace GuessGameWebApp.Controllers
             ViewBag.LogMessage = sessionUser.LogPrintOut;
 
             if (!ModelState.IsValid)
-            {                                
-                ViewBag.ScreenMessage = "Please enter 4 digits. 4 digits number can't start with 0.";                
+            {
+                ViewBag.ScreenMessage = "Please enter 4 digits. 4 digits number can't start with 0.";
             }
             else
             {
                 int numberRandom = sessionUser.RandomNum;
 
                 string enteredNum = guess.GuessDigit1 + guess.GuessDigit2 + guess.GuessDigit3 + guess.GuessDigit4;
+
                 int cleanNum = 0;
 
                 if (!int.TryParse(enteredNum, out cleanNum) || enteredNum.Distinct().Count() != enteredNum.Length)
-                {                    
-                    ViewBag.ScreenMessage = "Digits must be distinct.";                    
+                {
+                    ViewBag.ScreenMessage = "Digits must be distinct.";
                 }
                 else
                 {
