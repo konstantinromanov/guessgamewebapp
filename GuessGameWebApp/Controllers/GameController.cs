@@ -20,11 +20,10 @@ namespace GuessGameWebApp.Controllers
         private readonly IPlayerRepository _context;
 
         public GameController(IPlayerRepository context)
-        {
-            // ----------------For Db usage---------------------
+        {            
             _context = context;
 
-            //-----------------For InMemoryDb-------------------
+            //For InMemoryDb only. For Db usage run <update-database> in package manager, this line should be removed.
             _context = InMemoryDb.GetInMemoryRepository();
         }
 
@@ -106,6 +105,7 @@ namespace GuessGameWebApp.Controllers
 
                         ViewBag.WinStatus = sessionUser.GameStatus;
                         ViewBag.SecretNumber = numberRandom;
+
                         LeaderBoardUpdateService.UpdateLeaderBoard(_context, sessionUser);
 
                         return View("GameOver");
