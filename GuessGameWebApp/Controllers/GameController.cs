@@ -20,7 +20,7 @@ namespace GuessGameWebApp.Controllers
         private readonly IPlayerRepository _context;
 
         public GameController(IPlayerRepository context)
-        {            
+        {
             _context = context;
 
             //For InMemoryDb only. For Db usage run <update-database> in package manager, this line should be removed.
@@ -29,8 +29,30 @@ namespace GuessGameWebApp.Controllers
 
         public Game CurrentGame;
 
+
         public IActionResult Index()
         {
+            //Creates default Leader-board.
+            if (_context.Player.Count() == 0)
+            {
+                Dictionary<string, int[]> userName = new Dictionary<string, int[]>()
+                {
+                    { "Bill", new[]{4, 1}},
+                    { "Max", new[] { 3, 0 }},
+                    { "Marie", new[] { 1, 0 }}
+                };
+
+                foreach (KeyValuePair<string, int[]> player in userName)
+                {
+                    for (int i = 0; i < player.Value[0]; i++)
+                    {
+                        CurrentGame = new Game();
+                        CurrentGame.UserName = player.Key;
+                        CurrentGame.GameStatus = i < player.Value[1] ? "won" : "lost";
+                        LeaderBoardUpdateService.UpdateLeaderBoard(_context, CurrentGame);
+                    }
+                }
+            }
             return View("Index");
         }
 
@@ -48,11 +70,18 @@ namespace GuessGameWebApp.Controllers
                 return View("FirstScreen");
             }
             CurrentGame = new Game();
+
             CurrentGame.UserName = user.Name;
 
             ViewBag.TriesLeft = CurrentGame.TriesLeft;
             ViewBag.Greeting = user.Name;
             HttpContext.Session.SetString("SessionUser", JsonConvert.SerializeObject(CurrentGame));
+
+
+
+            CurrentGame.UserName = user.Name;
+
+
 
             return View("GameScreen");
         }
@@ -131,6 +160,8 @@ namespace GuessGameWebApp.Controllers
         {
             int n = 1;
 
+            int gamesTotal = _context.Player.AsEnumerable().Aggregate(0, (total, next) => total + next.GamesPlayed);
+
             Regex nRegex = new Regex("^[0-9]{1,2}$");
 
             if (nStr != null && nRegex.IsMatch(nStr))
@@ -144,7 +175,9 @@ namespace GuessGameWebApp.Controllers
                              where r.GamesPlayed >= n
                              select r;
 
-            sortedRank = sortedRank.OrderByDescending(r => r.Rank).ThenBy(g => g.GamesPlayed);
+            sortedRank = sortedRank.OrderByDescending(r => _context.Player.Count() != 0 ? (decimal)r.Wins / (decimal)gamesTotal : 0).ThenBy(g => g.GamesPlayed);
+
+            ViewBag.gamesTotal = gamesTotal;
 
             return View(sortedRank);
         }

@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<GuessGameWebApp.Models.Player>
-
+@{
+  int gamesTotal = ViewBag.gamesTotal;
+}
 <hr />
 <h1>Leader board</h1>
 <section class="mt-5">
@@ -10,13 +12,13 @@
   </h3>
   @*<div class="my-3 mx-2"><b>N</b> is set to @ViewBag.NgamesPlayed currently</div>*@
   <form asp-action="LeaderBoard">
-    
+
     <div class="container">
       <div class="row w-25">
 
-        <div class="col">          
+        <div class="col">
           <div class="form-group">
-            
+
             <input name="nStr" type="text" class="form-control" maxlength="2" style="width: 75px;" placeholder="@ViewBag.NgamesPlayed" />
           </div>
         </div>
@@ -49,12 +51,13 @@
           @Html.DisplayNameFor(model => model.Wins)
         </th>
         <th>
-          @Html.DisplayNameFor(model => model.Rank)
+          Rank
         </th>
-        
+
       </tr>
     </thead>
     <tbody>
+
       @foreach (var item in Model)
       {
         <tr>
@@ -71,8 +74,11 @@
           <td>
             @Html.DisplayFor(modelItem => item.Wins)
           </td>
-          <td>
-            @Html.DisplayFor(modelItem => item.Rank)
+          <td>           
+            @{                
+                decimal rank = gamesTotal != 0 ? (decimal)item.Wins / (decimal)gamesTotal : 0;
+            }
+            @Html.DisplayFor(modelItem => rank)
           </td>
 
         </tr>
