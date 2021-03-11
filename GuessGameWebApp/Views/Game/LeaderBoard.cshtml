@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<GuessGameWebApp.Models.Player>
-@{
-  int gamesTotal = ViewBag.gamesTotal;
-}
+@*@{
+    int gamesTotal = ViewBag.gamesTotal;
+  }*@
 <hr />
 <h1>Leader board</h1>
 <section class="mt-5">
@@ -45,13 +45,13 @@
           @Html.DisplayNameFor(model => model.GamesPlayed)
         </th>
         <th>
-          @Html.DisplayNameFor(model => model.Loses)
+          @Html.DisplayNameFor(model => model.Losses)
         </th>
         <th>
           @Html.DisplayNameFor(model => model.Wins)
         </th>
         <th>
-          Rank
+          @Html.DisplayNameFor(model => model.Rank)
         </th>
 
       </tr>
@@ -69,18 +69,18 @@
             @Html.DisplayFor(modelItem => item.GamesPlayed)
           </td>
           <td>
-            @Html.DisplayFor(modelItem => item.Loses)
+            @Html.DisplayFor(modelItem => item.Losses)
           </td>
           <td>
             @Html.DisplayFor(modelItem => item.Wins)
           </td>
-          <td>           
-            @{                
-                decimal rank = gamesTotal != 0 ? (decimal)item.Wins / (decimal)gamesTotal : 0;
-            }
-            @Html.DisplayFor(modelItem => rank)
+          <td>
+            @Html.DisplayFor(modelItem => item.Rank)
+            @*@{
+                  decimal rank = gamesTotal != 0 ? (decimal)item.Wins / (decimal)gamesTotal : 0;
+              }
+              Html.DisplayFor(modelItem => rank)*@
           </td>
-
         </tr>
       }
     </tbody>

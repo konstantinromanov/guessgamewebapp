@@ -54,9 +54,9 @@ namespace GuessGameWebApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GamesPlayed = table.Column<int>(type: "int", nullable: false),
-                    Loses = table.Column<int>(type: "int", nullable: false),
+                    Losses = table.Column<int>(type: "int", nullable: false),
                     Wins = table.Column<int>(type: "int", nullable: false),
-                    Rank = table.Column<decimal>(type: "decimal", nullable: false)
+                    Rank = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
